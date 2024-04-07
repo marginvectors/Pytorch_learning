@@ -31,6 +31,17 @@ class Adam(GenericAdaptiveOptimizer):
         return group['lr']
     
     def adam_update(self,state:Dict[str,any],group:Dict[str,any],param:torch.nn.Parameter,m:torch.Tensor,v:torch.Tensor):
+        beta1,beta2 = group['betas']
+        bias_correction1 = 1-beta1 ** state['step']
+        bias_correction2 = 1-beta2** state['step']
+        lr = self.get_lr(state,group)
+        if self.optimized_update:
+            denominator = v.sqrt().add_(group['eps'])
+            step_size = lr * math.sqrt(bias_correction2) / bias_correction1
+            param.data.addcdiv_(m,denominator,value=-step_size)
+        else:
+            denominator = (v.sqrt()/math.sqrt(bias))
+    
 
 
 
